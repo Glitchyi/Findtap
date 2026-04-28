@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>SPA Delegate Fixture</title></head>
+<body>
+  <div id="menu">
+    <span data-action="open">Open</span>
+    <span data-action="close">Close</span>
+    <span data-action="settings">Settings</span>
+  </div>
+  <script>
+    document.getElementById('menu').addEventListener('click', function (e) {
+      const action = e.target.dataset.action;
+      if (action) window.__lastAction = action;
+    });
+  </script>
+</body>
+</html>

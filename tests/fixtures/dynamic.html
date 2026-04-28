@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Dynamic Fixture</title></head>
+<body>
+  <button id="btn-initial">Initial Button</button>
+  <script>
+    setTimeout(function () {
+      const btn = document.createElement('button');
+      btn.id = 'btn-dynamic';
+      btn.textContent = 'Dynamic Button';
+      document.body.appendChild(btn);
+    }, 500);
+  </script>
+</body>
+</html>

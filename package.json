@@ -1,0 +1,15 @@
+{
+  "name": "findtap",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:chrome": "node build/patch.js chrome",
+    "build:firefox": "node build/patch.js firefox",
+    "package": "node build/package.js",
+    "test": "node build/patch.js chrome && npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}
