@@ -7,6 +7,7 @@ import { dispatch } from './dispatcher.js';
 /** @type {'INACTIVE'|'ACTIVE'} */
 let state = 'INACTIVE';
 let maxResults = 5;
+let enterSelectsFirst = true;
 let candidates = [];
 let rankedCandidates = [];
 let debounceTimer = null;
@@ -30,8 +31,9 @@ async function activate() {
   state = 'ACTIVE';
 
   try {
-    const stored = await chrome.storage.sync.get('maxResults');
+    const stored = await chrome.storage.sync.get(['maxResults', 'enterSelectsFirst']);
     maxResults = (typeof stored.maxResults === 'number') ? stored.maxResults : 5;
+    enterSelectsFirst = stored.enterSelectsFirst !== undefined ? stored.enterSelectsFirst : true;
     console.log('[FindTap] maxResults:', maxResults);
 
     await chrome.runtime.sendMessage({ action: 'INJECT_CSS' });
@@ -89,7 +91,7 @@ function handleKeydown(e) {
     return;
   }
 
-  if (e.key === 'Enter' && rankedCandidates.length > 0) {
+  if (e.key === 'Enter' && enterSelectsFirst && rankedCandidates.length > 0) {
     e.preventDefault();
     const target = rankedCandidates[0];
     clear();

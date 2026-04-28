@@ -1,39 +1,53 @@
 const DEFAULT_MAX_RESULTS = 5;
+const DEFAULT_ENTER_SELECTS_FIRST = true;
 
 async function load() {
-  // Load maxResults
-  const { maxResults = DEFAULT_MAX_RESULTS } = await chrome.storage.sync.get('maxResults');
-  document.getElementById('maxResults').value = maxResults;
+  const stored = await chrome.storage.sync.get(['maxResults', 'enterSelectsFirst']);
+
+  document.getElementById('maxResults').value =
+    typeof stored.maxResults === 'number' ? stored.maxResults : DEFAULT_MAX_RESULTS;
+
+  document.getElementById('enterSelectsFirst').checked =
+    stored.enterSelectsFirst !== undefined ? stored.enterSelectsFirst : DEFAULT_ENTER_SELECTS_FIRST;
 
   // Show current shortcut
   const commands = await chrome.commands.getAll();
   const cmd = commands.find(c => c.name === 'toggle-palette');
-  const display = document.getElementById('shortcut-display');
-  display.textContent = cmd?.shortcut || 'Not set';
+  document.getElementById('shortcut-display').textContent = cmd?.shortcut || 'Not set';
 }
 
 async function save() {
   const raw = parseInt(document.getElementById('maxResults').value, 10);
   const maxResults = Math.min(10, Math.max(3, isNaN(raw) ? DEFAULT_MAX_RESULTS : raw));
-  await chrome.storage.sync.set({ maxResults });
+  const enterSelectsFirst = document.getElementById('enterSelectsFirst').checked;
+
+  await chrome.storage.sync.set({ maxResults, enterSelectsFirst });
+
   const status = document.getElementById('status');
   status.textContent = 'Saved.';
   setTimeout(() => { status.textContent = ''; }, 1500);
 }
 
-// The shortcuts page can't be opened via chrome.tabs.create from an extension,
-// so copy the URL to clipboard and instruct the user.
-document.getElementById('shortcuts-link').addEventListener('click', async (e) => {
-  e.preventDefault();
+// Open chrome://extensions/shortcuts via the background service worker —
+// chrome:// URLs can only be navigated from the background context.
+document.getElementById('shortcuts-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('shortcuts-btn');
   try {
-    await navigator.clipboard.writeText('chrome://extensions/shortcuts');
-    const link = e.target;
-    link.textContent = 'Copied! Paste in address bar';
-    setTimeout(() => { link.textContent = 'chrome://extensions/shortcuts'; }, 2000);
+    await chrome.runtime.sendMessage({ action: 'OPEN_SHORTCUTS' });
   } catch {
-    // clipboard denied — just show the URL as-is so user can copy manually
+    // Background didn't respond — fall back to clipboard
+    try {
+      await navigator.clipboard.writeText('chrome://extensions/shortcuts');
+      const orig = btn.innerHTML;
+      btn.textContent = 'Copied — paste in address bar';
+      setTimeout(() => { btn.innerHTML = orig; }, 2500);
+    } catch { /* clipboard also denied — nothing to do */ }
   }
 });
 
 document.getElementById('save').addEventListener('click', save);
+
+// Auto-save toggle immediately on flip
+document.getElementById('enterSelectsFirst').addEventListener('change', save);
+
 load();

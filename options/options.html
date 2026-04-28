@@ -43,8 +43,34 @@
       box-shadow: 0 1px 0 #adb3bc;
     }
     .hint { font-size: 12px; color: #777; margin-top: 8px; line-height: 1.5; }
-    .hint a { color: #1a73e8; text-decoration: none; }
-    .hint a:hover { text-decoration: underline; }
+    .btn-shortcut {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+      border: 1px solid #d0d7de; border-radius: 6px; background: white;
+      color: #1a73e8; text-decoration: none; margin-top: 10px;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-shortcut:hover { background: #f0f6ff; border-color: #89b4fa; }
+    .btn-shortcut svg { flex-shrink: 0; }
+    /* Toggle */
+    .toggle-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+    .toggle-row label { font-size: 14px; flex: 1; cursor: pointer; }
+    .toggle {
+      position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: #d1d5db; border-radius: 22px;
+      cursor: pointer; transition: background .2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle input:checked + .toggle-slider { background: #1a73e8; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
   </style>
 </head>
 <body>
@@ -56,11 +82,14 @@
       <span class="shortcut-label">Toggle palette</span>
       <kbd id="shortcut-display">Loading…</kbd>
     </div>
-    <p class="hint">
-      To change this shortcut, open
-      <a href="#" id="shortcuts-link">chrome://extensions/shortcuts</a>
-      and find <strong>FindTap</strong>.
-    </p>
+    <button id="shortcuts-btn" class="btn-shortcut">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      Change shortcut
+    </button>
   </div>
 
   <div class="card">
@@ -69,6 +98,13 @@
       <label for="maxResults">Max results shown (3–10)</label>
       <input id="maxResults" type="number" min="3" max="10" value="5" />
       <button id="save" class="btn btn-primary">Save</button>
+    </div>
+    <div class="toggle-row">
+      <label for="enterSelectsFirst">Press Enter to click the top result</label>
+      <label class="toggle">
+        <input type="checkbox" id="enterSelectsFirst" checked />
+        <span class="toggle-slider"></span>
+      </label>
     </div>
     <div id="status"></div>
   </div>

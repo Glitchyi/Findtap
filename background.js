@@ -15,6 +15,13 @@ chrome.commands.onCommand.addListener(async (command) => {
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === 'OPEN_SHORTCUTS') {
+    // chrome:// URLs can only be opened from the background context
+    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+    sendResponse({});
+    return;
+  }
+
   if (msg.action !== 'INJECT_CSS') return;
   const tabId = sender.tab?.id;
   if (!tabId) { sendResponse({}); return; }
