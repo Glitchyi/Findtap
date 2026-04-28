@@ -1,3 +1,7 @@
 {
-  "minimum_chrome_version": "109"
+  "minimum_chrome_version": "109",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
 }

@@ -5,10 +5,6 @@
   "description": "Keyboard-driven search and click for any webpage.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

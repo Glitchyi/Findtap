@@ -4,5 +4,8 @@
       "id": "findtap@findtap.dev",
       "strict_min_version": "109.0"
     }
+  },
+  "background": {
+    "scripts": ["background.js"]
   }
 }
