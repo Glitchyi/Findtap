@@ -7,6 +7,8 @@
     "build:chrome": "node build/patch.js chrome",
     "build:firefox": "node build/patch.js firefox",
     "package": "node build/package.js",
+    "package:chrome": "node build/package.js chrome",
+    "package:firefox": "node build/package.js firefox",
     "test": "node build/patch.js chrome && npx playwright test"
   },
   "devDependencies": {
