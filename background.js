@@ -16,10 +16,18 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'OPEN_SHORTCUTS') {
-    // chrome:// URLs can only be opened from the background context
-    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
-    sendResponse({});
-    return;
+    // chrome:// URLs can only be opened from the background context.
+    // Firefox uses moz-extension:// scheme and has no shortcuts deep-link —
+    // best we can do is open about:addons (the parent page).
+    const isFirefox = chrome.runtime.getURL('').startsWith('moz-extension://');
+    const url = isFirefox ? 'about:addons' : 'chrome://extensions/shortcuts';
+    chrome.tabs.create({ url }, () => {
+      // Swallow any error (e.g. policy-blocked) and tell the options page
+      // whether we succeeded so it can fall back to clipboard if needed.
+      const failed = !!chrome.runtime.lastError;
+      sendResponse({ failed });
+    });
+    return true; // async sendResponse
   }
 
   if (msg.action !== 'INJECT_CSS') return;
