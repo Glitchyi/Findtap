@@ -482,7 +482,11 @@ Stored in `chrome.storage.sync`:
 | `maxResults` | `number` | `5` | `3–10` |
 | `enterSelectsFirst` | `boolean` | `true` | `true` / `false` |
 
-Options page (`options/options.html`): single number input for `maxResults` + note directing to `chrome://extensions/shortcuts`.
+Options page (`options/options.html`):
+- Must use the same Cursor-inspired Slate theme as the palette: `#111317` page background, `#1b1f27` controls, `#303642` borders, `#e6e8ee` text, cyan action accents, and red only for primary FindTap emphasis.
+- Must keep the settings UI compact because Chrome renders it inside the extension details modal.
+- Must include a branded header, keyboard shortcut section, `maxResults` number input, `enterSelectsFirst` toggle, save/status affordance, and a note that settings sync locally through browser extension storage.
+- Must not add new storage keys without updating this section and getting approval.
 
 ---
 

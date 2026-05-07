@@ -4,110 +4,332 @@
   <meta charset="UTF-8">
   <title>FindTap Settings</title>
   <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111317;
+      --surface: #171a20;
+      --surface-raised: #1b1f27;
+      --border: #303642;
+      --border-strong: #3a4250;
+      --text: #e6e8ee;
+      --muted: #8b929f;
+      --accent: #5cc8ff;
+      --accent-strong: #32b8f6;
+      --primary: #c0392b;
+      --primary-strong: #e74c3c;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #f6f8fa;
-      padding: 32px;
+      background: var(--bg);
+      color: var(--text);
       min-width: 420px;
-      color: #1a1a2e;
+      padding: 0;
     }
-    h1 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+
+    .shell {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .mark {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .mark::after {
+      content: '1';
+      position: absolute;
+      transform: translate(16px, -16px);
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 6px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 10px;
+      line-height: 16px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.32);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 750;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
     .card {
-      background: white;
-      border: 1px solid #e1e4e8;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 20px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+    }
+
+    .card h2 {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
       margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
     }
-    .card h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #555; text-transform: uppercase; letter-spacing: .04em; }
-    .row { display: flex; align-items: center; gap: 12px; }
-    label { font-size: 14px; flex: 1; }
+
+    .row,
+    .shortcut-row,
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .row + .toggle-row {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(48, 54, 66, 0.72);
+    }
+
+    label,
+    .shortcut-label {
+      flex: 1;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
     input[type="number"] {
-      width: 64px; padding: 6px 10px; font-size: 14px;
-      border: 1px solid #d0d7de; border-radius: 6px; outline: none;
+      width: 76px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      outline: none;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 650;
     }
-    input[type="number"]:focus { border-color: #89b4fa; box-shadow: 0 0 0 3px rgba(137,180,250,.2); }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(92, 200, 255, 0.18);
+    }
+
     .btn {
-      padding: 6px 16px; font-size: 14px; font-weight: 500; cursor: pointer;
-      border: 1px solid #d0d7de; border-radius: 6px; background: white;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 8px 16px;
+      background: var(--surface-raised);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
     }
-    .btn-primary { background: #1a73e8; color: white; border-color: #1a73e8; }
-    .btn-primary:hover { background: #1558b0; }
-    #status { font-size: 13px; color: #2da44e; min-height: 18px; margin-top: 10px; }
-    .shortcut-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .shortcut-label { font-size: 14px; flex: 1; }
+
+    .btn-primary {
+      border-color: rgba(92, 200, 255, 0.54);
+      background: var(--accent);
+      color: #081018;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-strong);
+    }
+
+    #status {
+      min-height: 18px;
+      margin-top: 12px;
+      color: var(--accent);
+      font-size: 13px;
+    }
+
     kbd {
-      background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px;
-      padding: 3px 8px; font-family: monospace; font-size: 13px;
-      box-shadow: 0 1px 0 #adb3bc;
+      min-width: 74px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      text-align: center;
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
     }
-    .hint { font-size: 12px; color: #777; margin-top: 8px; line-height: 1.5; }
+
     .btn-shortcut {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
-      border: 1px solid #d0d7de; border-radius: 6px; background: white;
-      color: #1a73e8; text-decoration: none; margin-top: 10px;
-      transition: background .15s, border-color .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 8px 13px;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      background: var(--surface-raised);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 750;
+      text-decoration: none;
+      transition: background .14s ease, border-color .14s ease, color .14s ease;
     }
-    .btn-shortcut:hover { background: #f0f6ff; border-color: #89b4fa; }
+
+    .btn-shortcut:hover {
+      border-color: rgba(92, 200, 255, 0.55);
+      background: #202631;
+      color: var(--text);
+    }
+
     .btn-shortcut svg { flex-shrink: 0; }
+
     /* Toggle */
-    .toggle-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
-    .toggle-row label { font-size: 14px; flex: 1; cursor: pointer; }
+    .toggle-row label { cursor: pointer; }
+
     .toggle {
-      position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0;
+      position: relative;
+      display: inline-block;
+      flex: 0 0 auto;
+      width: 48px;
+      height: 28px;
     }
+
     .toggle input { opacity: 0; width: 0; height: 0; }
+
     .toggle-slider {
-      position: absolute; inset: 0; background: #d1d5db; border-radius: 22px;
-      cursor: pointer; transition: background .2s;
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: #252a34;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease;
     }
+
     .toggle-slider::before {
-      content: ''; position: absolute;
-      width: 16px; height: 16px; left: 3px; bottom: 3px;
-      background: white; border-radius: 50%; transition: transform .2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      bottom: 3px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform .18s ease, background .18s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.32);
     }
-    .toggle input:checked + .toggle-slider { background: #1a73e8; }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    .toggle input:checked + .toggle-slider {
+      border-color: rgba(92, 200, 255, 0.6);
+      background: rgba(92, 200, 255, 0.22);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+      background: var(--accent);
+    }
+
+    .note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 560px) {
+      .shell { padding: 22px; }
+      .row,
+      .shortcut-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      input[type="number"],
+      .btn,
+      kbd {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>FindTap Settings</h1>
+  <main class="shell">
+    <header class="hero">
+      <div class="mark" aria-hidden="true">F</div>
+      <div>
+        <h1>FindTap Settings</h1>
+        <p class="subtitle">Keyboard-first controls for page search and selection.</p>
+      </div>
+    </header>
 
-  <div class="card">
-    <h2>Keyboard Shortcut</h2>
-    <div class="shortcut-row">
-      <span class="shortcut-label">Toggle palette</span>
-      <kbd id="shortcut-display">Loading…</kbd>
-    </div>
-    <button id="shortcuts-btn" class="btn-shortcut">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-        <polyline points="15 3 21 3 21 9"/>
-        <line x1="10" y1="14" x2="21" y2="3"/>
-      </svg>
-      Change shortcut
-    </button>
-  </div>
+    <div class="grid">
+      <section class="card" aria-labelledby="shortcut-heading">
+        <h2 id="shortcut-heading">Keyboard Shortcut</h2>
+        <div class="shortcut-row">
+          <span class="shortcut-label">Toggle palette</span>
+          <kbd id="shortcut-display">Loading…</kbd>
+        </div>
+        <button id="shortcuts-btn" class="btn-shortcut">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          Change shortcut
+        </button>
+      </section>
 
-  <div class="card">
-    <h2>Search</h2>
-    <div class="row">
-      <label for="maxResults">Max results shown (3–10)</label>
-      <input id="maxResults" type="number" min="3" max="10" value="5" />
-      <button id="save" class="btn btn-primary">Save</button>
+      <section class="card" aria-labelledby="search-heading">
+        <h2 id="search-heading">Search</h2>
+        <div class="row">
+          <label for="maxResults">Max results shown</label>
+          <input id="maxResults" type="number" min="3" max="10" value="5" aria-label="Max results shown from 3 to 10" />
+          <button id="save" class="btn btn-primary">Save</button>
+        </div>
+        <div class="toggle-row">
+          <label for="enterSelectsFirst">Enter clicks top result</label>
+          <label class="toggle">
+            <input type="checkbox" id="enterSelectsFirst" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div id="status" aria-live="polite"></div>
+      </section>
+
+      <p class="note">Settings are stored with browser extension sync. FindTap does not send page content, URLs, or usage behavior to any remote service.</p>
     </div>
-    <div class="toggle-row">
-      <label for="enterSelectsFirst">Press Enter to click the top result</label>
-      <label class="toggle">
-        <input type="checkbox" id="enterSelectsFirst" checked />
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-    <div id="status"></div>
-  </div>
+  </main>
 
   <script src="options.js"></script>
 </body>
