@@ -533,6 +533,7 @@ Build output hygiene:
 - `build/patch.js` must recreate `dist/<browser>/` from scratch on every build.
 - Unpacked output must contain only: `manifest.json`, bundled `content.js`, `background.js`, `injected.js`, `styles/`, and `options/`.
 - Stale source modules such as `collector.js`, `fuzzy.js`, `overlay.js`, `highlighter.js`, `dispatcher.js`, or old loader files must never remain in `dist/<browser>/`.
+- Local Playwright output directories such as `test-results/` and `playwright-report/` are generated artifacts and must stay out of version control.
 
 ---
 
