@@ -30,20 +30,26 @@ Trigger `Cmd/Ctrl+Shift+F` → a dark floating search palette appears centered a
 | Build output | `dist/chrome/` (dev/unpacked), `dist/chrome-packed/findtap-chrome.zip` (release) |
 | Testing | Playwright against static HTML fixtures |
 
-### Visual Design (Catppuccin Mocha theme)
+### Visual Design (Cursor-inspired Slate theme)
 
 | Token | Value |
 |---|---|
-| Background (root/palette) | `#1e1e2e` |
-| Surface (input) | `#313244` |
-| Border | `#45475a` |
-| Text | `#cdd6f4` |
-| Placeholder | `#6c7086` |
-| Badge color (2–N) | `#89b4fa` (blue) |
-| Badge color (1 / Enter) | `#c0392b` (red) with glow |
-| Outline color (2–N) | `#89b4fa` |
-| Outline color (1 / Enter) | `#e74c3c` with glow |
-| Font | Inter (Google Fonts import) |
+| Background (root/palette) | `#111317` |
+| Surface (input) | `#1b1f27` |
+| Border | `#303642` |
+| Input border | `#3a4250` |
+| Palette/input border width | `1px` |
+| Text | `#e6e8ee` |
+| Placeholder | `#8b929f` |
+| Badge color (2–N) | `#5cc8ff` |
+| Badge color (1 / Enter) | `#c0392b` (red) |
+| Outline color (2–N) | `#5cc8ff` |
+| Outline color (1 / Enter) | `#e74c3c` with controlled red glow |
+| Matched-element outline width | `2px` |
+| Matched-element corner radius | `6px` |
+| Badge corner radius | `6px` |
+| Motion | Subtle 120–140ms ease-out fade/scale; disabled under `prefers-reduced-motion: reduce` |
+| Font | Inter if available locally, otherwise system UI sans-serif |
 
 ### Non-Goals (v0.1)
 - Shadow DOM traversal
@@ -136,12 +142,21 @@ content.js:
 ```
 collector.js: collectSemanticCandidates(maxResults)
         │
-        ├─ querySelectorAll(SEMANTIC_SELECTORS)
+        ├─ detect active modal/dialog scope:
+        │     dialog[open], [aria-modal="true"], [role="dialog"], [role="alertdialog"]
+        │     If one or more visible modal scopes exist, collect only inside the topmost modal
+        │     If no visible modal scope exists, collect from document
+        ├─ querySelectorAll(SEMANTIC_SELECTORS) within the active scope
         ├─ isVisible(el):
         │     offsetParent !== null
         │     computed visibility !== 'hidden'
         │     computed display !== 'none'
-        │     getBoundingClientRect() width > 0 AND height > 0
+        │     getBoundingClientRect() width >= 8 AND height >= 8
+        │     rect.width * rect.height >= 400
+        │     element is not inside #findtap-root
+        ├─ isTopmostCandidate(el):
+        │     document.elementFromPoint() at center/corners resolves to el or a descendant
+        │     Background controls covered by a modal/backdrop are excluded
         ├─ isInViewport(el):
         │     rect.top < innerHeight AND rect.bottom > 0
         │     rect.left < innerWidth  AND rect.right  > 0
@@ -151,6 +166,10 @@ collector.js: collectSemanticCandidates(maxResults)
                Pass 2: isVisible only (full page, no viewport check)
                Mark: { origin: 'viewport' | 'page' }
 ```
+
+Minimum clickable size is intentionally permissive: hamburger menus and icon buttons around `24px × 24px` remain valid, while tiny dots, tracking pixels, resize handles, and accidental micro-targets are excluded.
+
+When a modal/dialog is active, FindTap searches the modal first and ignores covered background content. This keeps queries such as "install" targeted to the visible modal action instead of the dimmed page button that opened it. Modal scope applies equally to semantic candidates and fallback listener candidates.
 
 ### 3.3 Candidate Collection — Fallback (Event Listeners)
 
@@ -212,36 +231,46 @@ On each input event (debounced 150ms):
 
 ### 3.6 Overlay DOM Structure
 
-Two separate fixed layers injected into `document.body`:
+One fixed root is injected into `document.body`; the badge layer and palette are siblings inside that root:
 
 ```html
-<!-- Layer 1: palette only — interactive -->
 <div id="findtap-root">
+  <!-- Layer 1: hint badges only — never intercepts clicks -->
+  <div id="findtap-hint-layer">
+    <div class="findtap-hint" data-index="1" style="top: Xpx; left: Ypx;">1</div>
+    <div class="findtap-hint" data-index="2" style="top: Xpx; left: Ypx;">2</div>
+    <!-- … up to maxResults -->
+  </div>
+
+  <!-- Layer 2: palette only — interactive -->
   <div id="findtap-palette">
     <input id="findtap-input" type="text" autocomplete="off" spellcheck="false" placeholder="Search…" />
   </div>
 </div>
-
-<!-- Layer 2: hint badges only — never intercepts clicks -->
-<div id="findtap-hint-layer">
-  <div class="findtap-hint" data-index="1" style="top: Xpx; left: Ypx;">1</div>
-  <div class="findtap-hint" data-index="2" style="top: Xpx; left: Ypx;">2</div>
-  <!-- … up to maxResults -->
-</div>
 ```
 
-**Why two layers:** Keeps the interactive palette DOM fully separate from the purely-visual badge layer. Badge z-index can be managed independently; no risk of badge DOM mutations affecting palette event handling.
+**Why nested layers:** Keeps the interactive palette DOM separate from the purely-visual badge layer while making both children of `#findtap-root`. This lets the MutationObserver ignore extension-owned badge mutations via the existing `root.contains(m.target)` guard, preventing self-triggered re-renders that clear badges.
+
+Layering contract:
+- `#findtap-root` and `#findtap-palette` must always be the top extension UI at `z-index: 2147483647`.
+- `#findtap-hint-layer` and `.findtap-hint` must also use `z-index: 2147483647` so number badges are never hidden by page content.
+- `overlay.mount()` appends `#findtap-hint-layer` before `#findtap-palette` inside `#findtap-root`; with equal max z-index values, this keeps the search palette above the badge layer by DOM paint order.
+- The search input must keep focus and remain visually above badges/highlights while FindTap is active.
 
 ### 3.7 Badge Positioning
 
 ```
 rect = el.getBoundingClientRect()
 
-badge.style.top  = rect.top  + 'px'   ← viewport coords, NO scroll offset
-badge.style.left = rect.left + 'px'   ← viewport coords, NO scroll offset
+badge.style.top  = max(0, rect.top)  + 'px'  ← top-left corner, viewport-clamped
+badge.style.left = max(0, rect.left) + 'px'
 ```
 
 Both `#findtap-root` and `#findtap-hint-layer` are `position: fixed` — their coordinate space IS the viewport. Adding `window.scrollY`/`window.scrollX` (document coords) is wrong and causes badges to drift when the page is scrolled.
+
+Badges must always be generated for every visible ranked candidate:
+- Numbers are placed at the clickable element's top-left bounding-box corner.
+- Placement is clamped to the viewport so badges never disappear above or left of the fixed root.
 
 Visibility guard in `render()` — badge is skipped if:
 - `rect.width === 0 || rect.height === 0`
@@ -254,9 +283,10 @@ Visibility guard in `render()` — badge is skipped if:
 
 ```
 highlighter.js: apply(rankedCandidates[])
-  For i = 0: el.classList.add('findtap-active', 'findtap-active-primary')
-  For i > 0: el.classList.add('findtap-active')
-  Push to activeElements[]
+  clear()
+  For each ranked candidate in order:
+    apply findtap-active; if i = 0 also apply findtap-active-primary
+    Push element to activeElements[]
 
 highlighter.js: clear()
   For each el in activeElements[]:
@@ -274,7 +304,7 @@ User presses [1–N] or Enter (fires candidate[0])
         │
         ▼
 highlighter.clear()
-overlay.unmount()          ← removes BOTH #findtap-root and #findtap-hint-layer
+overlay.unmount()          ← removes #findtap-root, including #findtap-hint-layer
 MutationObserver.disconnect()
 removeListeners()
 state = 'INACTIVE'
@@ -295,7 +325,7 @@ Esc  OR  pointerdown outside #findtap-root
         │
         ▼
 highlighter.clear()
-overlay.unmount()          ← removes both DOM layers
+overlay.unmount()          ← removes #findtap-root and all extension-owned visual layers
 MutationObserver.disconnect()
 clearTimeout(debounceTimer)
 removeListeners()
@@ -346,7 +376,7 @@ const SEMANTIC_SELECTORS = [
 #findtap-hint-layer {
   position: fixed; inset: 0;
   overflow: hidden; pointer-events: none;
-  z-index: 2147483646;
+  z-index: 2147483647;
 }
 
 /* Palette shell */
@@ -354,38 +384,76 @@ const SEMANTIC_SELECTORS = [
   position: absolute; top: 12px; left: 50%;
   transform: translateX(-50%);
   pointer-events: all;
-  background: #1e1e2e; border: 1px solid #45475a; border-radius: 8px;
+  z-index: 2147483647;
+  background: #111317; border: 1px solid #303642; border-radius: 10px;
   padding: 8px; min-width: 320px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  box-shadow: 0 18px 48px rgba(0,0,0,.42);
   font-family: 'Inter', system-ui, sans-serif;
+  animation: findtap-palette-in 120ms ease-out both;
+}
+
+/* Palette input */
+#findtap-input {
+  width: 100%;
+  background: #1b1f27; border: 1px solid #3a4250; border-radius: 7px;
+  color: #e6e8ee;
+  font-size: 14px; font-family: 'Inter', system-ui, sans-serif;
+  padding: 6px 10px; outline: none; box-sizing: border-box;
 }
 
 /* Badges 2–N: blue */
 .findtap-hint {
   position: absolute; pointer-events: none;
-  background: #89b4fa; color: #1e1e2e;
+  background: #5cc8ff; color: #081018;
   font-size: 11px; font-weight: 700;
-  padding: 2px 6px; border-radius: 3px;
+  padding: 2px 6px; border-radius: 6px;
+  animation: findtap-hint-in 120ms ease-out both;
   z-index: 2147483647;
 }
 
 /* Badge 1 (Enter target): red + glow */
 .findtap-hint[data-index="1"] {
   background: #c0392b; color: #fff; font-weight: 900;
-  box-shadow: 0 0 6px 2px rgba(231,76,60,.8), 0 0 12px 4px rgba(231,76,60,.4);
+  box-shadow: 0 0 6px 2px rgba(231,76,60,.7), 0 0 12px 4px rgba(231,76,60,.28);
 }
 
 /* Element outlines 2–N: blue */
 .findtap-active {
-  outline: 2px solid #89b4fa !important;
+  outline: 2px solid #5cc8ff !important;
   outline-offset: 2px !important;
+  border-radius: 6px !important;
+  animation: findtap-highlight-in 140ms ease-out both !important;
 }
 
 /* Element outline 1 (primary): red + glow */
 .findtap-active-primary {
   outline: 2px solid #e74c3c !important;
   outline-offset: 2px !important;
-  box-shadow: 0 0 8px 2px rgba(231,76,60,.7), 0 0 16px 4px rgba(231,76,60,.3) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 0 8px 2px rgba(231,76,60,.62), 0 0 16px 4px rgba(231,76,60,.24) !important;
+}
+
+@keyframes findtap-palette-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px) scale(.98); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes findtap-hint-in {
+  from { opacity: 0; transform: scale(.88); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes findtap-highlight-in {
+  from { box-shadow: 0 0 0 0 rgba(92,200,255,0); }
+  to { box-shadow: 0 0 0 2px rgba(92,200,255,.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #findtap-palette,
+  .findtap-hint,
+  .findtap-active {
+    animation: none !important;
+  }
 }
 ```
 
@@ -412,6 +480,7 @@ Stored in `chrome.storage.sync`:
 | Key | Type | Default | Range |
 |---|---|---|---|
 | `maxResults` | `number` | `5` | `3–10` |
+| `enterSelectsFirst` | `boolean` | `true` | `true` / `false` |
 
 Options page (`options/options.html`): single number input for `maxResults` + note directing to `chrome://extensions/shortcuts`.
 
@@ -432,6 +501,8 @@ build/package.js             ← builds chrome then zips dist/chrome/ → dist/c
 ```
 npm run build:chrome    → node build/patch.js chrome
 npm run build:firefox   → node build/patch.js firefox
+npm run test:e2e:chrome → build:chrome + Playwright real-extension tests
+npm run test:security   → Playwright static security checks
 npm run package         → node build/package.js
 npm test                → build:chrome + playwright
 ```
@@ -458,6 +529,11 @@ dist/
     └── findtap-chrome.zip   ← submit to Chrome Web Store
 ```
 
+Build output hygiene:
+- `build/patch.js` must recreate `dist/<browser>/` from scratch on every build.
+- Unpacked output must contain only: `manifest.json`, bundled `content.js`, `background.js`, `injected.js`, `styles/`, and `options/`.
+- Stale source modules such as `collector.js`, `fuzzy.js`, `overlay.js`, `highlighter.js`, `dispatcher.js`, or old loader files must never remain in `dist/<browser>/`.
+
 ---
 
 ## 9. Manifest
@@ -480,7 +556,30 @@ dist/
 
 ---
 
-## 10. Edge Cases & Known Handling
+## 10. Security Baseline
+
+FindTap is a local-only extension. It must not collect, transmit, or persist page content, URLs, or user behavior.
+
+Mandatory security rules:
+- No network calls: no `fetch`, XHR, WebSocket, remote CSS imports, remote fonts, analytics, beacons, or external assets.
+- No dynamic code execution: no `eval()` and no `new Function()`.
+- No page-content/user-behavior/URL logging in production content scripts.
+- Styles are injected only through `chrome.scripting.insertCSS`; no `<style>` tags and no inline style attributes for extension stylesheet injection.
+- Cross-world communication uses `CustomEvent` on `document` only; do not introduce `window.postMessage` or another bridge.
+- Storage is limited to documented options keys: `maxResults` and `enterSelectsFirst`.
+- Manifest permissions stay minimal: `activeTab`, `scripting`, and `storage`; `host_permissions` remains `[]`.
+- Content-script URL matching is broad so the launcher can work on arbitrary pages, but this must not be expanded into broad `host_permissions`.
+
+Automated security checks must assert:
+- No forbidden network primitives or remote imports in source.
+- No dynamic code execution in source.
+- No undocumented `chrome.storage.sync` keys.
+- Manifest permissions and `host_permissions` match this section.
+- Built unpacked extension output contains only expected files.
+
+---
+
+## 11. Edge Cases & Known Handling
 
 | Scenario | Handling |
 |---|---|
@@ -488,6 +587,8 @@ dist/
 | `findtap-active` on mutated-away element | `clear()` called before every re-render |
 | Element gone between scan and click | try/catch in `dispatcher.dispatch`; fallback `el.click()` |
 | Viewport results < `maxResults` | Auto-expand to full page (Pass 2 in collector) |
+| Active modal/dialog | Search only the topmost visible modal scope; exclude background controls hidden by the modal/backdrop |
+| Occluded clickable element | Excluded unless `elementFromPoint()` at a representative point resolves to the candidate or its descendant |
 | Zero results | Palette stays open, no badges rendered, no host classes applied |
 | Icon-only buttons | `aria-label` → `alt` → `name`; excluded if all empty |
 | CSP blocks style injection | `chrome.scripting.insertCSS` — never inline style attributes |
@@ -504,7 +605,7 @@ dist/
 
 ---
 
-## 11. Testing Strategy
+## 12. Testing Strategy
 
 ```
 tests/fixtures/
@@ -520,12 +621,27 @@ tests/fixtures/
 
 Stack: Playwright (Chromium), actual unpacked extension via `--load-extension`, no API mocking.
 
+Chromium real-extension tests:
+- Build `dist/chrome/` before test launch.
+- Launch Chromium with a persistent context using `--disable-extensions-except=dist/chrome` and `--load-extension=dist/chrome`.
+- Resolve the MV3 extension id from the service worker.
+- Open static fixtures and activate the real extension through runtime messaging or an equivalent command path.
+- Assert behavior against the real content script, overlay, highlighter, dispatcher, storage, and injected CSS.
+- In automated direct-message activation, `activeTab` is not granted the same way as a real browser command; tests validate overlay behavior and stylesheet contents, while command-granted `chrome.scripting.insertCSS` remains a manual smoke check unless the harness can trigger browser commands reliably.
+
+Firefox automation:
+- `npm run build:firefox` is required to validate Firefox build output.
+- Full Firefox browser automation is deferred because Playwright's extension-loading path is Chromium-oriented; Firefox E2E requires a separate `web-ext` / WebDriver strategy.
+
 | Area | Type |
 |---|---|
 | `fuzzy.js` scorer | Unit |
 | Viewport-first collection | Playwright fixture |
+| Modal-scoped collection | Playwright inline fixture |
 | `findtap-active` add + cleanup | Playwright fixture |
 | Badge top-left positioning (no scroll drift) | Playwright + getBoundingClientRect assertion |
 | Keyboard 1–N + Enter triggers correct element | Playwright key sequence |
 | Dismiss: all classes and DOM cleaned up | Playwright assertion |
 | `maxResults` persistence | Playwright + storage read |
+| Real extension activation/click/dismiss | Playwright Chromium persistent context |
+| Security baseline | Static Playwright checks |

@@ -6,6 +6,8 @@
   "scripts": {
     "build:chrome": "node build/patch.js chrome",
     "build:firefox": "node build/patch.js firefox",
+    "test:e2e:chrome": "node build/patch.js chrome && npx playwright test tests/extension.e2e.spec.js",
+    "test:security": "npx playwright test tests/security.spec.js",
     "package": "node build/package.js",
     "package:chrome": "node build/package.js chrome",
     "package:firefox": "node build/package.js firefox",

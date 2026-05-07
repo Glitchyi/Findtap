@@ -30,14 +30,15 @@ export function mount() {
   input.spellcheck = false;
   input.placeholder = 'Search…';
 
+  // Keep hint layer inside root so MutationObserver ignores our own badge churn.
+  hintLayer = document.createElement('div');
+  hintLayer.id = 'findtap-hint-layer';
+  root.appendChild(hintLayer);
+
+  // Append palette root after hint layer so it paints above badges at max z-index.
   palette.appendChild(input);
   root.appendChild(palette);
   document.body.appendChild(root);
-
-  // Separate layer just for hint badges — keeps them independent of the palette
-  hintLayer = document.createElement('div');
-  hintLayer.id = 'findtap-hint-layer';
-  document.body.appendChild(hintLayer);
 
   return input;
 }
@@ -65,8 +66,7 @@ export function render(rankedCandidates) {
       badge.textContent = String(i + 1);
       // hintLayer is position:fixed so rect coords are already viewport-relative —
       // do NOT add scroll offsets here
-      badge.style.top = rect.top + 'px';
-      badge.style.left = rect.left + 'px';
+      _positionBadge(badge, rect);
 
       hintLayer.appendChild(badge);
       badges.push(badge);
@@ -80,13 +80,13 @@ export function render(rankedCandidates) {
  */
 export function reposition() {
   for (let i = 0; i < badges.length; i++) {
-    const candidate = currentCandidates[i];
+    const index = Number(badges[i].dataset.index) - 1;
+    const candidate = currentCandidates[index];
     if (!candidate) continue;
     try {
       const rect = candidate.el.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) continue;
-      badges[i].style.top = rect.top + 'px';
-      badges[i].style.left = rect.left + 'px';
+      _positionBadge(badges[i], rect);
     } catch { /* element may be detached */ }
   }
 }
@@ -96,7 +96,6 @@ export function reposition() {
  */
 export function unmount() {
   if (root && root.parentNode) root.parentNode.removeChild(root);
-  if (hintLayer && hintLayer.parentNode) hintLayer.parentNode.removeChild(hintLayer);
   root = null;
   hintLayer = null;
   input = null;
@@ -111,4 +110,12 @@ function _clearBadges() {
     } catch { /* already removed */ }
   }
   badges = [];
+}
+
+function _positionBadge(badge, rect) {
+  const top = Math.max(0, rect.top);
+  const left = Math.max(0, rect.left);
+  badge.dataset.placement = 'inside';
+  badge.style.top = top + 'px';
+  badge.style.left = left + 'px';
 }

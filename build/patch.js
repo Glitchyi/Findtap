@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, cpSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, cpSync, mkdirSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -44,6 +44,7 @@ const patch = JSON.parse(readFileSync(join(root, `manifest.${browser}.patch.json
 const merged = deepMerge(base, patch);
 
 const outDir = join(root, 'dist', browser);
+rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(merged, null, 2));
 writeFileSync(join(outDir, 'content.js'), bundleContent());
