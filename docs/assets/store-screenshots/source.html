@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FindTap Store Screenshots</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111317;
+      --surface: #171a20;
+      --surface-raised: #1b1f27;
+      --border: #303642;
+      --border-strong: #3a4250;
+      --text: #e6e8ee;
+      --muted: #8b929f;
+      --accent: #5cc8ff;
+      --accent-strong: #32b8f6;
+      --primary: #c0392b;
+      --primary-strong: #e74c3c;
+      --green: #7ed7a8;
+      --yellow: #ffd36e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 1280px;
+      min-width: 1280px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    .slide {
+      display: none;
+      position: relative;
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 24% 12%, rgba(92, 200, 255, .14), transparent 28%),
+        linear-gradient(180deg, #151820, #111317 64%);
+    }
+
+    body[data-slide="1"] #slide-1,
+    body[data-slide="2"] #slide-2,
+    body[data-slide="3"] #slide-3,
+    body[data-slide="4"] #slide-4,
+    body[data-slide="5"] #slide-5 {
+      display: block;
+    }
+
+    .brand {
+      position: absolute;
+      top: 42px;
+      left: 52px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 54px;
+      height: auto;
+    }
+
+    .headline {
+      position: absolute;
+      top: 92px;
+      left: 74px;
+      width: 520px;
+      margin: 0;
+      color: var(--text);
+      font-size: 54px;
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .copy {
+      position: absolute;
+      top: 278px;
+      left: 78px;
+      width: 480px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1.45;
+    }
+
+    .callout {
+      position: absolute;
+      left: 78px;
+      bottom: 82px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+      font-size: 18px;
+      font-weight: 760;
+    }
+
+    .callout::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      background: var(--primary-strong);
+      box-shadow: 0 0 14px rgba(231, 76, 60, .52);
+    }
+
+    .browser {
+      position: absolute;
+      right: 64px;
+      bottom: 72px;
+      width: 590px;
+      height: 520px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 34px 96px rgba(0, 0, 0, .36);
+      overflow: hidden;
+    }
+
+    .browser.wide {
+      width: 680px;
+      height: 500px;
+    }
+
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 48px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      background: #14171d;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-strong);
+    }
+
+    .url {
+      flex: 1;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-raised);
+    }
+
+    .page {
+      position: relative;
+      height: calc(100% - 48px);
+      padding: 30px;
+      background:
+        linear-gradient(90deg, rgba(48, 54, 66, .5) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(48, 54, 66, .46) 1px, transparent 1px),
+        #111317;
+      background-size: 86px 86px;
+    }
+
+    .palette {
+      position: absolute;
+      top: 34px;
+      left: 50%;
+      width: 370px;
+      transform: translateX(-50%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      background: #111317;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .42);
+      z-index: 5;
+    }
+
+    .input {
+      height: 42px;
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 9px 12px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 560;
+    }
+
+    .input .muted {
+      color: var(--muted);
+    }
+
+    .target {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      min-height: 46px;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 0 18px;
+      background: rgba(92, 200, 255, .08);
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 720;
+    }
+
+    .target.primary {
+      border-color: var(--primary-strong);
+      background: rgba(231, 76, 60, .12);
+      box-shadow: 0 0 18px rgba(231, 76, 60, .28);
+    }
+
+    .badge {
+      position: absolute;
+      top: -13px;
+      left: -13px;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: var(--accent);
+      color: #081018;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 26px;
+      text-align: center;
+    }
+
+    .primary .badge {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(231, 76, 60, .6);
+    }
+
+    .card {
+      position: absolute;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      background: rgba(27, 31, 39, .92);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      color: var(--text);
+      font-size: 18px;
+    }
+
+    .line {
+      height: 10px;
+      margin-top: 10px;
+      border-radius: 99px;
+      background: var(--border-strong);
+    }
+
+    .line.short {
+      width: 62%;
+    }
+
+    .setting-shell {
+      position: absolute;
+      right: 90px;
+      bottom: 72px;
+      width: 560px;
+      height: 540px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #111317;
+      box-shadow: 0 34px 96px rgba(0, 0, 0, .4);
+      padding: 34px;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .settings-header img {
+      width: 58px;
+      height: auto;
+    }
+
+    .settings-header h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .settings-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+      background: var(--surface);
+      margin-bottom: 16px;
+    }
+
+    .settings-card h3 {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 18px;
+    }
+
+    .kbd,
+    .number {
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 8px 12px;
+      background: var(--surface-raised);
+      color: var(--text);
+      font-weight: 760;
+      min-width: 74px;
+      text-align: center;
+    }
+
+    .toggle {
+      width: 52px;
+      height: 30px;
+      border: 1px solid rgba(92, 200, 255, .6);
+      border-radius: 999px;
+      background: rgba(92, 200, 255, .2);
+      padding: 3px;
+    }
+
+    .knob {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-left: auto;
+    }
+
+    .privacy-list {
+      position: absolute;
+      right: 104px;
+      top: 162px;
+      width: 560px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .privacy-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+      background: rgba(27, 31, 39, .84);
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 720;
+    }
+
+    .check {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: rgba(126, 215, 168, .16);
+      color: var(--green);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .modal {
+      position: absolute;
+      right: 106px;
+      bottom: 76px;
+      width: 510px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f7f8fb;
+      color: #111317;
+      box-shadow: 0 34px 96px rgba(0, 0, 0, .38);
+      padding: 34px;
+      z-index: 4;
+    }
+
+    .modal h3 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .modal p {
+      margin: 0 0 26px;
+      color: #535b68;
+      font-size: 17px;
+    }
+
+    .modal-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 136px;
+      min-height: 44px;
+      border-radius: 999px;
+      background: #155bd7;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .modal .target {
+      color: #111317;
+      background: rgba(231, 76, 60, .1);
+    }
+
+    .overlay-scrim {
+      position: absolute;
+      inset: 48px 0 0;
+      background: rgba(255, 255, 255, .72);
+      z-index: 2;
+    }
+
+    .slide-2 .headline,
+    .slide-4 .headline {
+      width: 590px;
+    }
+
+    .slide-2 .copy,
+    .slide-4 .copy {
+      width: 430px;
+    }
+  </style>
+</head>
+<body data-slide="1">
+  <section class="slide" id="slide-1">
+    <div class="brand"><img src="../findtap-icon.svg" alt="">FindTap</div>
+    <h1 class="headline">Search any page from the keyboard.</h1>
+    <p class="copy">Open the palette, type a label, and FindTap highlights matching controls directly on the webpage.</p>
+    <div class="callout">Cmd/Ctrl + Shift + F opens the launcher</div>
+    <div class="browser">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
+      <div class="page">
+        <div class="palette"><div class="input">Search... <span class="muted">install</span></div></div>
+        <div class="card" style="left:34px;top:132px;width:220px;"><h3>Project settings</h3><div class="line"></div><div class="line short"></div></div>
+        <div class="target primary" style="left:60px;bottom:76px;width:265px;"><span class="badge">1</span>Install extension</div>
+        <div class="target" style="right:54px;bottom:155px;width:190px;"><span class="badge">2</span>View docs</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide-2" id="slide-2">
+    <div class="brand"><img src="../findtap-icon.svg" alt="">FindTap</div>
+    <h1 class="headline">Numbered badges make selection instant.</h1>
+    <p class="copy">The top match is red for Enter. Other matches get clear number badges so you can choose without moving focus around the page.</p>
+    <div class="callout">Press Enter or a visible number</div>
+    <div class="browser wide">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
+      <div class="page">
+        <div class="palette"><div class="input">Search... <span class="muted">settings</span></div></div>
+        <div class="target primary" style="left:54px;top:160px;width:260px;"><span class="badge">1</span>Settings</div>
+        <div class="target" style="right:62px;top:210px;width:238px;"><span class="badge">2</span>Account settings</div>
+        <div class="target" style="left:112px;bottom:72px;width:205px;"><span class="badge">3</span>Test settings</div>
+        <div class="target" style="right:88px;bottom:94px;width:178px;"><span class="badge">4</span>Details</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-3">
+    <div class="brand"><img src="../findtap-icon.svg" alt="">FindTap</div>
+    <h1 class="headline">Search inside the active modal.</h1>
+    <p class="copy">When a dialog is open, FindTap prioritizes the modal and ignores covered background controls.</p>
+    <div class="callout">Safer targeting on complex web apps</div>
+    <div class="browser wide">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url"></span></div>
+      <div class="page">
+        <div class="target" style="left:46px;top:170px;width:258px;opacity:.28;"><span class="badge"> </span>Background install</div>
+        <div class="overlay-scrim"></div>
+        <div class="palette"><div class="input">Search... <span class="muted">install</span></div></div>
+        <div class="modal">
+          <h3>Choose a device</h3>
+          <p>FindTap searches this active dialog first.</p>
+          <div class="target primary" style="position:relative;left:0;top:0;width:170px;"><span class="badge">1</span>Install</div>
+          <div class="modal-button" style="position:absolute;right:34px;bottom:34px;">Confirm</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide-4" id="slide-4">
+    <div class="brand"><img src="../findtap-icon.svg" alt="">FindTap</div>
+    <h1 class="headline">Compact settings with the same slate design.</h1>
+    <p class="copy">Tune result count, Enter behavior, and shortcut access from a focused extension settings page.</p>
+    <div class="callout">Simple controls, synced by the browser</div>
+    <div class="setting-shell">
+      <div class="settings-header">
+        <img src="../findtap-icon.svg" alt="">
+        <h2>FindTap Settings</h2>
+      </div>
+      <div class="settings-card">
+        <h3>Keyboard Shortcut</h3>
+        <div class="settings-row"><span>Toggle palette</span><span class="kbd">⇧⌘F</span></div>
+      </div>
+      <div class="settings-card">
+        <h3>Search</h3>
+        <div class="settings-row"><span>Max results shown</span><span class="number">5</span></div>
+        <div class="settings-row"><span>Enter clicks top result</span><span class="toggle"><span class="knob"></span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-5">
+    <div class="brand"><img src="../findtap-icon.svg" alt="">FindTap</div>
+    <h1 class="headline">Private by default. Local by design.</h1>
+    <p class="copy">FindTap has no analytics, no remote code, no network calls, and no page data collection.</p>
+    <div class="callout">Built for browser extension review clarity</div>
+    <div class="privacy-list">
+      <div class="privacy-item"><span class="check">✓</span>No user data collection</div>
+      <div class="privacy-item"><span class="check">✓</span>No remote scripts or styles</div>
+      <div class="privacy-item"><span class="check">✓</span>No page content logging</div>
+      <div class="privacy-item"><span class="check">✓</span>Only stores extension preferences</div>
+      <div class="privacy-item"><span class="check">✓</span>Open-source privacy policy</div>
+    </div>
+  </section>
+</body>
+</html>

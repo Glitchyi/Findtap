@@ -76,6 +76,12 @@ Website logo assets:
 - `docs/assets/findtap-logo.svg` is the source horizontal lockup.
 - PNG exports may be generated from those SVGs for upload surfaces that do not accept SVG; preserve the source icon aspect ratio unless a target platform explicitly requires square artwork.
 
+Chrome Web Store screenshot assets:
+- Store screenshots live in `docs/assets/store-screenshots/`.
+- Required export size is `1280 × 800` PNG with an opaque background.
+- The set contains five first-party screenshots: quick search, numbered badges, modal targeting, settings, and local privacy.
+- Screenshot source HTML lives at `docs/assets/store-screenshots/source.html`; generated PNGs must not depend on external images, fonts, scripts, or network resources.
+
 ---
 
 ## 2. Architecture
