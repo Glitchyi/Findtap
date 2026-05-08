@@ -29,6 +29,7 @@ Trigger `Cmd/Ctrl+Shift+F` → a dark floating search palette appears centered a
 | Manifests | Single base + per-browser patch script (`build/patch.js`) |
 | Build output | `dist/chrome/` (dev/unpacked), `dist/chrome-packed/findtap-chrome.zip` (release) |
 | Testing | Playwright against static HTML fixtures |
+| Website | Static GitHub Pages site from `docs/` |
 
 ### Visual Design (Cursor-inspired Slate theme)
 
@@ -58,6 +59,16 @@ Trigger `Cmd/Ctrl+Shift+F` → a dark floating search palette appears centered a
 - AI-powered ranking
 - Mobile browser support
 - Arrow/Tab navigation through results
+
+### Public Website
+
+The project website is a static GitHub Pages site in `docs/`:
+- `docs/index.html` is the public landing page for FindTap.
+- `docs/privacy.html` is the public privacy policy page for Chrome Web Store submission.
+- `docs/.nojekyll` keeps GitHub Pages from applying Jekyll processing.
+- No external scripts, fonts, analytics, network resources, or build tooling are allowed.
+- Intended GitHub Pages URL after enabling Pages from `main` / `/docs`: `https://glitchyi.github.io/Findtap/`.
+- Intended Chrome Web Store privacy URL: `https://glitchyi.github.io/Findtap/privacy.html`.
 
 ---
 
