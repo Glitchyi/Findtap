@@ -77,10 +77,10 @@ Website logo assets:
 - PNG exports may be generated from those SVGs for upload surfaces that do not accept SVG; square icon exports must stay at exact square dimensions such as `128 × 128` and `512 × 512`.
 
 Chrome Web Store screenshot assets:
-- Store screenshots live in `docs/assets/store-screenshots/`.
+- Store screenshots live in `store-assets/store-screenshots/`, outside `docs/`, so they are not part of the GitHub Pages deployment.
 - Required export size is `1280 × 800` PNG with an opaque background.
 - The set contains five first-party screenshots: quick search, numbered badges, modal targeting, settings, and local privacy.
-- Screenshot source HTML lives at `docs/assets/store-screenshots/source.html`; generated PNGs must not depend on external images, fonts, scripts, or network resources.
+- Screenshot source HTML lives at `store-assets/store-screenshots/source.html`; generated PNGs must not depend on external images, fonts, scripts, or network resources.
 
 Chrome Web Store upload-only promo assets:
 - Promo tiles live in `store-assets/promo-tiles/`, outside `docs/`, so they are not part of the GitHub Pages deployment.
