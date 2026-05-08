@@ -72,9 +72,9 @@ The project website is a static GitHub Pages site in `docs/`:
 - Intended Chrome Web Store privacy URL: `https://glitchyi.github.io/Findtap/privacy.html`.
 
 Website logo assets:
-- `docs/assets/findtap-icon.svg` is the source square icon.
+- `docs/assets/findtap-icon.svg` is the source icon and uses the creator-provided `128 × 125` rounded dark shell.
 - `docs/assets/findtap-logo.svg` is the source horizontal lockup.
-- PNG exports may be generated from those SVGs for upload surfaces that do not accept SVG.
+- PNG exports may be generated from those SVGs for upload surfaces that do not accept SVG; preserve the source icon aspect ratio unless a target platform explicitly requires square artwork.
 
 ---
 
