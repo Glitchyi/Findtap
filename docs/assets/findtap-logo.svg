@@ -11,8 +11,8 @@
       </feMerge>
     </filter>
   </defs>
-  <g transform="translate(24 18)">
-    <rect x="1" y="1" width="126" height="123" rx="61.5" fill="#05001C" fill-opacity="0.2" stroke="#2E2E2E" stroke-width="2"/>
+  <g transform="translate(24 16)">
+    <rect x="1" y="1" width="126" height="126" rx="63" fill="#05001C" fill-opacity="0.2" stroke="#2E2E2E" stroke-width="2"/>
     <path fill="#E6E8EE" d="M36 94V35h41v13H52v13h21v13H52v20H36z"/>
     <g filter="url(#badgeGlow)">
       <rect x="72" y="14" width="42" height="24" rx="10" fill="#C0392B"/>
