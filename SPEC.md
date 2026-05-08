@@ -565,6 +565,12 @@ Build output hygiene:
 
 FindTap is a local-only extension. It must not collect, transmit, or persist page content, URLs, or user behavior.
 
+Chrome Web Store privacy disclosure:
+- Public privacy policy document: `PRIVACY.md`.
+- Intended privacy policy URL after pushing `main`: `https://github.com/Glitchyi/Findtap/blob/main/PRIVACY.md`.
+- Data usage form should select no user-data categories because FindTap does not collect, transmit, sell, or share personal data, browsing history, website content, user activity, location, authentication data, financial data, health data, or personal communications.
+- The three Chrome Web Store data-use certifications must be checked when the submitted package matches this spec.
+
 Mandatory security rules:
 - No network calls: no `fetch`, XHR, WebSocket, remote CSS imports, remote fonts, analytics, beacons, or external assets.
 - No dynamic code execution: no `eval()` and no `new Function()`.
