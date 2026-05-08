@@ -65,10 +65,16 @@ Trigger `Cmd/Ctrl+Shift+F` → a dark floating search palette appears centered a
 The project website is a static GitHub Pages site in `docs/`:
 - `docs/index.html` is the public landing page for FindTap.
 - `docs/privacy.html` is the public privacy policy page for Chrome Web Store submission.
+- `docs/assets/` contains first-party website/logo assets only.
 - `docs/.nojekyll` keeps GitHub Pages from applying Jekyll processing.
 - No external scripts, fonts, analytics, network resources, or build tooling are allowed.
 - Intended GitHub Pages URL after enabling Pages from `main` / `/docs`: `https://glitchyi.github.io/Findtap/`.
 - Intended Chrome Web Store privacy URL: `https://glitchyi.github.io/Findtap/privacy.html`.
+
+Website logo assets:
+- `docs/assets/findtap-icon.svg` is the source square icon.
+- `docs/assets/findtap-logo.svg` is the source horizontal lockup.
+- PNG exports may be generated from those SVGs for upload surfaces that do not accept SVG.
 
 ---
 
