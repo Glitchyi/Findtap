@@ -82,6 +82,11 @@ Chrome Web Store screenshot assets:
 - The set contains five first-party screenshots: quick search, numbered badges, modal targeting, settings, and local privacy.
 - Screenshot source HTML lives at `docs/assets/store-screenshots/source.html`; generated PNGs must not depend on external images, fonts, scripts, or network resources.
 
+Chrome Web Store upload-only promo assets:
+- Promo tiles live in `store-assets/promo-tiles/`, outside `docs/`, so they are not part of the GitHub Pages deployment.
+- Required exports are `small-promo-tile-440x280.png` and `marquee-promo-tile-1400x560.png`.
+- Promo tile source HTML lives at `store-assets/promo-tiles/source.html`; generated PNGs must not depend on external images, fonts, scripts, or network resources.
+
 ---
 
 ## 2. Architecture
