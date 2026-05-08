@@ -665,6 +665,7 @@ Chromium real-extension tests:
 - Launch Chromium with a persistent context using `--disable-extensions-except=dist/chrome` and `--load-extension=dist/chrome`.
 - Resolve the MV3 extension id from the service worker.
 - Open static fixtures and activate the real extension through runtime messaging or an equivalent command path.
+- Static fixture servers must force-close idle browser connections during teardown so publish validation is deterministic and does not hang on keep-alive sockets.
 - Assert behavior against the real content script, overlay, highlighter, dispatcher, storage, and injected CSS.
 - In automated direct-message activation, `activeTab` is not granted the same way as a real browser command; tests validate overlay behavior and stylesheet contents, while command-granted `chrome.scripting.insertCSS` remains a manual smoke check unless the harness can trigger browser commands reliably.
 
